@@ -35,3 +35,6 @@ path_to/
 	|------ *.mp3, *.wav
 	|--- .../
 ```
+
+![Release](https://img.shields.io/badge/Relase-0.1-lightgrey.svg)
+![Build](https://img.shields.io/badge/Build-Passive-brightgreen.svg)
