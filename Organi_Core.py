@@ -4,13 +4,27 @@ import urllib.request
 import shelve
 import os
 
+"""
+OrGaNi_Core, parte responsável pelo update do banco de dados!
+"""
+_father_group = []
+
+
 def get_main():
+	"""
+	Obtém o html principal da página File-Extensions e o retorna.
+	"""
+
 	html = urllib.request.urlopen("https://www.file-extensions.org")
 	aqv_read = html.read()
 	html.close()
 	return str(aqv_read)
 
 def gen_links(html):
+	"""
+	A partir do HTML principal, ele captura o menu principal e retorna uma lista com as urls desse menu.
+	"""
+
 	prefix = "https://www.file-extensions.org"
 
 	s = html.find("<ul class=\"submenu01\">")
@@ -29,9 +43,14 @@ def gen_links(html):
 	return list_of_links
 
 
-def gen_table_ext(list_of_links):
-	father_group = []
+def down_links_gen(list_of_links):
+	"""
+	Recebe uma lista de links e faz o download destes!
+	"""
 
+	global _father_group 
+
+	print("here")
 	try:
 		os.mkdir("Files")
 	except:
@@ -43,35 +62,49 @@ def gen_table_ext(list_of_links):
 		_HTMLCode = urllib.request.urlopen(link)
 		ind_name = link[::-1].find("/")
 		src_file = link[::-1][:ind_name][::-1] + ".html"
-		father_group.append(src_file)
+		gen_table_ext(_HTMLCode, src_file) #Gera tabela para esse HTML
+		_father_group.append(src_file)
 
-		write = False
+	return True
 
-		with open(src_file, "w") as file:
-			for line in _HTMLCode:
-				line = str(line)
-				index_of_table = line.find("<table")
+def gen_table_ext(HTMLCode, src):
+	"""
+	Obtém tabela com base no código HTML enviado.
+	"""
+
+	write = False
+
+	with open(src, "w") as file:
+		for line in HTMLCode:
+			line = str(line)
+			index_of_table = line.find("<table")
+			if index_of_table != -1:
+				write = True
+				index_of_table_end = line.find("</table>")
 				if index_of_table != -1:
-					write = True
-					index_of_table_end = line.find("</table>")
-					if index_of_table != -1:
-						file.write(line[index_of_table:index_of_table_end + len("</table>")])
-						break
-				elif write == True:
-					if line.find("</table>") != -1:
-						index_of_table_end = str(line).find("</table>")
-						file.write(line[:index_of_table + len("</table>")])
-						break
+					file.write(line[index_of_table:index_of_table_end + len("</table>")])
+					break
+			elif write == True:
+				if line.find("</table>") != -1:
+					index_of_table_end = str(line).find("</table>")
+					file.write(line[:index_of_table + len("</table>")])
+					break
 
-				else:
-					pass
+			else:
+				pass
 
-	return father_group
+	return True
 
-def gen_db_ext(father_group):
+def gen_db_ext():
+	"""
+	Obtém as extensões e descrições com base na tabela obtida. 
+	"""
+
+	global _father_group
+
 	list_of_extensions = []
 	list_of_description_wfather = []
-	for file_dir in father_group:
+	for file_dir in _father_group:
 		table = open(file_dir, "rb").read()
 		menu = str(table[:])
 		while menu.find("<strong class=\"color3\">") != -1:
