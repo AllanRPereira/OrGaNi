@@ -5,7 +5,7 @@ Software voltado para organização de arquivos com base nas preferências do us
 
 ## Funcionamento
 	
-    O software funciona da seguinte forma:
+O software funciona da seguinte forma:
 
 `python3 Organi_App.py [path_from] [path_to] [--mode]`
 
