@@ -50,7 +50,6 @@ def down_links_gen(list_of_links):
 
 	global _father_group 
 
-	print("here")
 	try:
 		os.mkdir("Files")
 	except:
