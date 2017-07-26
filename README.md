@@ -1,8 +1,8 @@
-#OrGaNi
+# OrGaNi
 
 	Software voltado para organização de arquivos com base nas preferências do usuário. Esse software foi testado apenas no Deepin 15
 
-##Funcionamento
+## Funcionamento
 	
 	O software funciona da seguinte forma:
 
@@ -16,7 +16,7 @@
 
 	`mode` : Modos para organização, podem ser `ext` ou `common`. Obs.: O modo common ainda não está 100%
 
-	####Ext
+	#### Ext
 	
 	```
 	path_to/
@@ -27,7 +27,7 @@
 		|--- .../
 	```
 
-	####Common
+	#### Common
 	
 	```
 	path_to/
@@ -38,13 +38,13 @@
 		|--- .../
 	```
 
-##Algumas outras funções!
-	`
+## Algumas outras funções!
+
 	`--update (-p)`: Atualiza o banco de dados da aplicação, é necessário para executa-lá
 
 	`--help (-h)`: Mostra o menu, com todas as informações da aplicação
 
-#Exemplo
+# Exemplo
 
 ```
 python3 Organi_App.py --update
