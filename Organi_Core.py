@@ -50,6 +50,8 @@ def down_links(list_of_links):
 	"""
 	global _progress
 	global _father_group 
+	max_index_link = len(list_of_links) - 1 
+	identificador = 0
 
 	try:
 		os.mkdir("Files")
@@ -59,13 +61,17 @@ def down_links(list_of_links):
 		os.chdir("Files")
 
 	for link in list_of_links:
-		_HTMLCode = urllib.request.urlopen(link).read().decode()
+		_HTMLCode = urllib.request.urlopen(link).read()
+		_HTMLCodeStr = _HTMLCode.decode()
 		_progress += 100/91
-		list_extra_links_names = gen_page_links(_HTMLCode, link)
-		list_of_links.extend(list_extra_links_names)
+		if list_of_links.index(link) <= max_index_link: 
+			list_extra_links_names = gen_page_links(_HTMLCodeStr, link)
+			list_of_links.extend(list_extra_links_names)		
+		
 		start = link.find("name/") + len("name/")
-		end = link.find("/", start)
-		src_file = link[start:end] + ".html"
+		end = len(link) if link.find("/", start) == -1 else link.find("/", start) 
+		src_file = link[start:end] + "_{}.html".format(identificador)
+		identificador += 1
 		gen_table_ext(_HTMLCode, src_file) #Gera tabela para esse HTML
 		_father_group.append(src_file)
 
@@ -89,36 +95,26 @@ def gen_page_links(_HTMLCodeSecund, prefix_link):
 	last_link = paragraf[start_link:end_link]
 
 	_pre = last_link[::-1].find("/")
-	_range = int(last_link[::-1][:_pre][::-1]) + 1 if last_link != "" else 2
+	try:
+		_range = int(last_link[::-1][:_pre][::-1]) + 1
+	except:
+		_range = 2
 
 	for i in range(2, _range):
-		list_of_page_links.append("{}/sortBy/extension/order/asc/page/{}".format(prefix_link, i))
+		list_of_page_links.append("{}/sortBy/extension/order/asc/page/{}".format(prefix_link, i, i))
 
 	return list_of_page_links
+
 def gen_table_ext(HTMLCode, src):
 	"""
 	Obtém tabela com base no código HTML enviado.
 	"""
 
-	write = False
-
+	HTMLCode = str(HTMLCode)
 	with open(src, "w") as file:
-		for line in HTMLCode:
-			index_of_table = line.find("<table")
-			if index_of_table != -1:
-				write = True
-				index_of_table_end = line.find("</table>")
-				if index_of_table != -1:
-					file.write(line[index_of_table:index_of_table_end + len("</table>")])
-					break
-			elif write == True:
-				if line.find("</table>") != -1:
-					index_of_table_end = str(line).find("</table>")
-					file.write(line[:index_of_table + len("</table>")])
-					break
-
-			else:
-				pass
+		init_table = HTMLCode.find("<table")
+		end_table = HTMLCode.find("</table>") + len("</table>")
+		file.write(HTMLCode[init_table:end_table])
 
 	return True
 
@@ -132,8 +128,8 @@ def gen_db_ext():
 	list_of_extensions = []
 	list_of_description_wfather = []
 	for file_dir in _father_group:
-		table = open(file_dir, "rb").read()
-		menu = str(table[:])
+		table = open(file_dir, "r").read()
+		menu = table[:]
 		while menu.find("<strong class=\"color3\">") != -1:
 			s = menu.find("<strong class=\"color3\">")
 			f = menu.find("</strong>")
@@ -141,7 +137,7 @@ def gen_db_ext():
 			list_of_extensions.append(extension)
 			menu = menu[f+len("</strong>"):]
 
-		man_description = str(table[:])
+		man_description = table[:]
 		while man_description.find("<td") != -1:
 			s = man_description.find("<td")
 			m = man_description.find(">", s)
@@ -149,7 +145,7 @@ def gen_db_ext():
 			description = man_description[m + 1:f]
 
 			if description.find("<span") == -1 and description.find("<a") == -1:
-				list_of_description_wfather.append((description, file_dir.replace("-", " ").capitalize()))
+				list_of_description_wfather.append((description, file_dir.replace("-", " ")[:file_dir.index("_")]).capitalize())
 
 			man_description = man_description[f+len("</td>"):]
 
@@ -161,3 +157,5 @@ def gen_db_ext():
 	db.close()
 
 	return True
+
+

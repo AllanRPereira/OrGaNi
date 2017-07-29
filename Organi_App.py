@@ -2,7 +2,7 @@ import sys
 import os
 import shelve
 import time
-import _thread
+import threading
 import Organi_Core as oc
 
 code_RED = "\033[1;31m"
@@ -114,17 +114,16 @@ def condition(*argv):
 	assert os.path.commonpath([argv[1]], argv[2]) != argv[1], "{}path_to{}{} não pode estar dentro de {}{}path_from{}".format(code_BLACK,code_END, code_RED, code_END, code_BLACK, code_END)
 	assert check_db(), "{}Banco de Dados não existe! Dê uma olhada no --help ou use --update{}".format(code_RED, code_END)
 
-def progress(thread):
+def progress():
 	"""
-	Thread que verifica o progresso do download, e o exibe
+	Thread que verifica o progresso do download, e o exibe. Sempre resetar ao fim do thread
 	"""
 
 	while oc._progress < 100:
 		n = int(oc._progress) if int(oc._progress + 0.5) >= oc._progress else int(oc._progress) + 1
 		print("{}{}{}{}% dos arquivos baixados{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_PURPLE, n, code_END), end="", flush=True)
 		time.sleep(1)
-
-	return True
+	oc._progress = 0
 
 def update():
 	"""
@@ -140,10 +139,10 @@ def update():
 		links = oc.gen_links(html)
 
 		print("{}Baixando cada link do mapa e Gerando tabelas!{}".format(code_GREEN, code_END))
-		_thread.start_new_thread(progress, ("Th-1",))
+		thread_progress = threading.Thread(target=progress).start()
 		oc.down_links(links)
 
-		print("{}Salvando arquivos no banco de dados{}".format(code_GREEN, code_END))
+		print("\n{}Salvando arquivos no banco de dados{}".format(code_GREEN, code_END))
 		oc.gen_db_ext()
 
 		print("{}Update finalizado{}".format(code_GREEN, code_END))
@@ -203,31 +202,32 @@ def init_app(path_from, path_to, db_object, mode):
 	"""
 	O Cerebro do App
 	"""
-
-	n_mode = mode
+	n_points = 1
 
 	for path, list_path, files in os.walk(path_from):
 		for file in files:
+			print("{}{}{}Processando arquivos{}{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_GREEN, n_points * ".", code_END), end="", flush=True)
+			n_points = (n_points + 1) if n_points <= 4 else 1
 			name, ext = os.path.splitext(file)
 			ext = ext.replace(".", "")
 			list_mode = [ext.capitalize()]
 			try:
-				list_mode.append(db_object[ext][1])
-				n_mode = 1 if mode != n_mode else 0 
+				list_mode.append(db_object[ext][1]) 
 			except:
 				msg = "File: não foi encontrado no Db, será adicionado em uma pasta com sua extensão!"
 				log(msg)
-				mode = 0
+				list_mode.append(ext.capitalize())
 			try:
-				os.mkdir(list_mode[n_mode])
-				os.chdir(list_mode[n_mode])
+				os.mkdir(list_mode[mode])
+				os.chdir(list_mode[mode])
 			except:
-				os.chdir(list_mode[n_mode])
+				os.chdir(list_mode[mode])
 			finally:
 				os.replace(os.path.join(path_from, file), os.path.join(path_to, file))
 				os.chdir("..")
 
 if __name__ == "__main__":
+	print("{}Bem Vindo! {} {}".format(code_BLACK, os.getlogin(), code_END))
 	app = start_app(*sys.argv)
 	print("{}Processo finalizado!!{}".format(code_WHITE, code_END))
 	sys.exit()
