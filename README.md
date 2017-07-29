@@ -15,7 +15,7 @@ python3. Obs.: Os arquivos nessa pasta serão movidos!
 `path_to` : Diretório para onde os arquivos serão movidos. Obs.: Esse diretório não pode estar dentro do `path_from` e
 não recomenda-se que haja arquivos nele
 
-`mode` : Modos para organização, podem ser `ext` ou `common`. Obs.: O modo common ainda não está 100%
+`mode` : Modos para organização, podem ser `ext` ou `common`.
 
 #### Ext
 
@@ -52,5 +52,15 @@ python3 Organi_App.py --update
 python Organi_App.py /home/carlinhos /home/arquivos_organizados_carlinhos --ext
 ```
 
-![Release](https://img.shields.io/badge/Relase-0.1-lightgrey.svg)
+
+## Requerimentos
+
+Os requerimentos para executar esse software são:
+
+* python3
+* conexão internet
+
+Nada mais é necessário para executá-lo
+
+![Release](https://img.shields.io/badge/Relase-0.4-lightgrey.svg)
 ![Build](https://img.shields.io/badge/Build-Passive-brightgreen.svg)

@@ -7,6 +7,7 @@ import os
 """
 OrGaNi_Core, parte responsável pelo update do banco de dados!
 """
+_progress = 0
 _father_group = []
 
 
@@ -42,12 +43,12 @@ def gen_links(html):
 
 	return list_of_links
 
-
-def down_links_gen(list_of_links):
+def down_links(list_of_links):
 	"""
-	Recebe uma lista de links e faz o download destes!
+	Recebe uma lista de links e faz o download destes e caso haja um sublink específico no no código HTML
+	faz o download deste também!
 	"""
-
+	global _progress
 	global _father_group 
 
 	try:
@@ -58,14 +59,42 @@ def down_links_gen(list_of_links):
 		os.chdir("Files")
 
 	for link in list_of_links:
-		_HTMLCode = urllib.request.urlopen(link)
-		ind_name = link[::-1].find("/")
-		src_file = link[::-1][:ind_name][::-1] + ".html"
+		_HTMLCode = urllib.request.urlopen(link).read().decode()
+		_progress += 100/91
+		list_extra_links_names = gen_page_links(_HTMLCode, link)
+		list_of_links.extend(list_extra_links_names)
+		start = link.find("name/") + len("name/")
+		end = link.find("/", start)
+		src_file = link[start:end] + ".html"
 		gen_table_ext(_HTMLCode, src_file) #Gera tabela para esse HTML
 		_father_group.append(src_file)
 
 	return True
 
+def gen_page_links(_HTMLCodeSecund, prefix_link):
+	"""
+	A partir da HTML da página, obtém as outras páginas secundárias!
+	"""
+	list_of_page_links = []
+	start_paragraf = _HTMLCodeSecund.find("<p class=\"pagenumber\"")
+	end_paragraf = _HTMLCodeSecund.find("</p>", start_paragraf)
+	paragraf = _HTMLCodeSecund[start_paragraf:end_paragraf]
+
+	start_a = paragraf[::-1].find("a<")
+	end_a = paragraf[::-1].find(">a/<")
+	paragraf = paragraf[::-1][end_a:start_a][::-1]
+
+	start_link = paragraf.find("\"") + 1
+	end_link = paragraf.find("\"", start_link)
+	last_link = paragraf[start_link:end_link]
+
+	_pre = last_link[::-1].find("/")
+	_range = int(last_link[::-1][:_pre][::-1]) + 1 if last_link != "" else 2
+
+	for i in range(2, _range):
+		list_of_page_links.append("{}/sortBy/extension/order/asc/page/{}".format(prefix_link, i))
+
+	return list_of_page_links
 def gen_table_ext(HTMLCode, src):
 	"""
 	Obtém tabela com base no código HTML enviado.
@@ -75,7 +104,6 @@ def gen_table_ext(HTMLCode, src):
 
 	with open(src, "w") as file:
 		for line in HTMLCode:
-			line = str(line)
 			index_of_table = line.find("<table")
 			if index_of_table != -1:
 				write = True
