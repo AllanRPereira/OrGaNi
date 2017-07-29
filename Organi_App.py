@@ -2,6 +2,7 @@ import sys
 import os
 import shelve
 import time
+import _thread
 import Organi_Core as oc
 
 code_RED = "\033[1;31m"
@@ -11,6 +12,8 @@ code_YELLOW = "\033[1;33m"
 code_PURPLE = "\033[1;35m"
 code_BLACK = "\033[1;40m"
 code_END = "\033[0m"
+code_MOVE_INIT = "\033[1G"
+code_CLEAR_LINE = "\033[2K"
 abs_dir_db = ""
 abs_dir_log = os.path.join(os.getcwd(), "log.txt")
 
@@ -111,6 +114,18 @@ def condition(*argv):
 	assert os.path.commonpath([argv[1]], argv[2]) != argv[1], "{}path_to{}{} não pode estar dentro de {}{}path_from{}".format(code_BLACK,code_END, code_RED, code_END, code_BLACK, code_END)
 	assert check_db(), "{}Banco de Dados não existe! Dê uma olhada no --help ou use --update{}".format(code_RED, code_END)
 
+def progress(thread):
+	"""
+	Thread que verifica o progresso do download, e o exibe
+	"""
+
+	while oc._progress < 100:
+		n = int(oc._progress) if int(oc._progress + 0.5) >= oc._progress else int(oc._progress) + 1
+		print("{}{}{}{}% dos arquivos baixados{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_PURPLE, n, code_END), end="", flush=True)
+		time.sleep(1)
+
+	return True
+
 def update():
 	"""
 	Atualiza ou Cria o Banco de Dados
@@ -125,7 +140,8 @@ def update():
 		links = oc.gen_links(html)
 
 		print("{}Baixando cada link do mapa e Gerando tabelas!{}".format(code_GREEN, code_END))
-		oc.down_links_gen(links)
+		_thread.start_new_thread(progress, ("Th-1",))
+		oc.down_links(links)
 
 		print("{}Salvando arquivos no banco de dados{}".format(code_GREEN, code_END))
 		oc.gen_db_ext()
