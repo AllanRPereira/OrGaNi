@@ -62,5 +62,5 @@ Os requerimentos para executar esse software são:
 
 Nada mais é necessário para executá-lo
 
-![Release](https://img.shields.io/badge/Relase-0.4-lightgrey.svg)
+![Release](https://img.shields.io/badge/Relase-0.5-lightgrey.svg)
 ![Build](https://img.shields.io/badge/Build-Passive-brightgreen.svg)
