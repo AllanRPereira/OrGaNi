@@ -16,6 +16,7 @@ code_MOVE_INIT = "\033[1G"
 code_CLEAR_LINE = "\033[2K"
 abs_dir_db = ""
 abs_dir_log = os.path.join(os.getcwd(), "log.txt")
+progress_var = True
 
 format_help = (code_YELLOW, code_END,
  	code_YELLOW, code_END,
@@ -101,8 +102,8 @@ def check_db():
 	"""
 
 	global abs_dir_db
-	abs_dir_db = os.path.join(os.getcwd(), "Files/extensions.db")
-	return os.path.isfile("Files/extensions.db")
+	abs_dir_db = os.path.join(os.getcwd(), "extensions.db")
+	return os.path.isfile("extensions.db")
 
 def condition(*argv):
 	"""
@@ -111,7 +112,7 @@ def condition(*argv):
 
 	assert os.path.isdir(argv[1]), "{}Diretório de {}{}path_from{}{} inválido!{}".format(code_RED, code_END, code_BLACK, code_END, code_RED, code_END)
 	assert os.path.isdir(argv[2]), "{}Diretório de {}{}path_to{}{} inválido!{}".format(code_RED, code_END, code_BLACK, code_END, code_RED, code_END)
-	assert os.path.commonpath([argv[1]], argv[2]) != argv[1], "{}path_to{}{} não pode estar dentro de {}{}path_from{}".format(code_BLACK,code_END, code_RED, code_END, code_BLACK, code_END)
+	assert os.path.commonpath([argv[1], argv[2]]) != argv[1], "{}path_to{}{} não pode estar dentro de {}{}path_from{}".format(code_BLACK,code_END, code_RED, code_END, code_BLACK, code_END)
 	assert check_db(), "{}Banco de Dados não existe! Dê uma olhada no --help ou use --update{}".format(code_RED, code_END)
 
 def progress():
@@ -119,7 +120,7 @@ def progress():
 	Thread que verifica o progresso do download, e o exibe. Sempre resetar ao fim do thread
 	"""
 
-	while oc._progress < 100:
+	while oc._progress <= 100 and progress_var == True:
 		n = int(oc._progress) if int(oc._progress + 0.5) >= oc._progress else int(oc._progress) + 1
 		print("{}{}{}{}% dos arquivos baixados{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_PURPLE, n, code_END), end="", flush=True)
 		time.sleep(1)
@@ -131,6 +132,8 @@ def update():
 	"""
 
 	try:
+		global progress_var		
+
 		print("{}Iniciando update{}".format(code_YELLOW, code_END))
 		print("{}Download página inicial!{}".format(code_GREEN, code_END))
 		html = oc.get_main()
@@ -141,8 +144,10 @@ def update():
 		print("{}Baixando cada link do mapa e Gerando tabelas!{}".format(code_GREEN, code_END))
 		thread_progress = threading.Thread(target=progress).start()
 		oc.down_links(links)
+		progress_var = False
+		print("\n{}Download Concluído!{}".format(code_GREEN, code_RED))		
 
-		print("\n{}Salvando arquivos no banco de dados{}".format(code_GREEN, code_END))
+		print("{}Salvando arquivos no banco de dados{}".format(code_GREEN, code_END))
 		oc.gen_db_ext()
 
 		print("{}Update finalizado{}".format(code_GREEN, code_END))
@@ -181,16 +186,17 @@ def start_app(*argv):
 
 	try:
 		os.mkdir(argv[2])
-	except PermissionError:
-		print("{}Erro com permissões! Tente usando sudo{}".format(code_RED, code_END))
-		return False
-	except:
-		os.chdir(argv[2])	
+	except Exception as e:
+		print("{}Error: {}{}".format(code_RED, e, code_END))
+
 
 	condition(*argv)
 
-	mode_function = args_check(argv[3])
+	os.chdir(argv[2])	
 
+
+	mode_function = args_check(argv[3])
+	db = shelve.open(abs_dir_db, "c")
 	if mode_function == False:
 		print("{}Você não digitou nenhum comando! Por favor, consulte o --help{}")
 	else:
@@ -202,14 +208,15 @@ def init_app(path_from, path_to, db_object, mode):
 	"""
 	O Cerebro do App
 	"""
-	n_points = 1
+	n_files = 1
 
 	for path, list_path, files in os.walk(path_from):
-		for file in files:
-			print("{}{}{}Processando arquivos{}{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_GREEN, n_points * ".", code_END), end="", flush=True)
-			n_points = (n_points + 1) if n_points <= 4 else 1
-			name, ext = os.path.splitext(file)
+		for aqv in files:
+			print("{}{}{}Processando arquivos:{}{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_GREEN, n_files, code_END), end="", flush=True)
+			n_files += 1
+			name, ext = os.path.splitext(aqv)
 			ext = ext.replace(".", "")
+			ext = ext if ext != "" else "others"
 			list_mode = [ext.capitalize()]
 			try:
 				list_mode.append(db_object[ext][1]) 
@@ -223,11 +230,15 @@ def init_app(path_from, path_to, db_object, mode):
 			except:
 				os.chdir(list_mode[mode])
 			finally:
-				os.replace(os.path.join(path_from, file), os.path.join(path_to, file))
+				try:
+					os.replace(os.path.join(path, aqv), os.path.join(os.getcwd(), aqv))
+				except Exception as e:
+					print("Error")
 				os.chdir("..")
 
+	print("")
 if __name__ == "__main__":
-	print("{}Bem Vindo! {} {}".format(code_BLACK, os.getlogin(), code_END))
+	print("{}Bem Vindo! {} {}".format(code_BLACK, os.uname()[1].capitalize(), code_END))
 	app = start_app(*sys.argv)
 	print("{}Processo finalizado!!{}".format(code_WHITE, code_END))
 	sys.exit()
