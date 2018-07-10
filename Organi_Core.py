@@ -145,17 +145,17 @@ def gen_db_ext():
 			description = man_description[m + 1:f]
 
 			if description.find("<span") == -1 and description.find("<a") == -1:
-				list_of_description_wfather.append((description, file_dir.replace("-", " ")[:file_dir.index("_")]).capitalize())
+				resolution = file_dir.replace("-", " ")[:file_dir.index("_")]
+				list_of_description_wfather.append((description, "".join(resolution).capitalize()))
 
 			man_description = man_description[f+len("</td>"):]
 
-
-	db = shelve.open("extensions", "c")
+	os.chdir("..")
+	db = shelve.open("extensions.db", "c")
 	for index in range(len(list_of_extensions)):
 		db[list_of_extensions[index]] = list_of_description_wfather[index]
 
 	db.close()
 
 	return True
-
 
