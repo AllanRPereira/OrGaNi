@@ -1,6 +1,6 @@
 # OrGaNi
 
-Software voltado para organização de arquivos com base nas preferências do usuário. Esse software foi testado apenas no Deepin 15
+Software voltado para organização de arquivos com base nas preferências do usuário. Esse software funciona apenas em sistemas Linux
    
 
 ## Funcionamento
@@ -49,7 +49,7 @@ path_to/
 
 ```
 python3 Organi_App.py --update
-python Organi_App.py /home/carlinhos /home/arquivos_organizados_carlinhos --ext
+python3 Organi_App.py /home/carlinhos /home/arquivos_organizados_carlinhos --ext
 ```
 
 
