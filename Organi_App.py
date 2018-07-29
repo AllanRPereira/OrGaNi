@@ -1,9 +1,13 @@
+#-*- coding:utf-8 -*-
+
+
 import sys
 import os
 import shelve
 import time
 import threading
 import Organi_Core as oc
+import subprocess
 
 code_RED = "\033[1;31m"
 code_WHITE = "\033[1;39m"
@@ -17,6 +21,7 @@ code_CLEAR_LINE = "\033[2K"
 abs_dir_db = ""
 abs_dir_log = os.path.join(os.getcwd(), "log.txt")
 progress_var = True
+md5_list_file = tuple()
 
 format_help = (code_YELLOW, code_END,
  	code_YELLOW, code_END,
@@ -39,6 +44,7 @@ def log(error):
 	"""
 	Função que gera arquivo, para eventuais erros em relação as extensões.
 	"""
+
 	log = open(abs_dir_log, "a")
 	log.write(error)
 	log.close()
@@ -91,7 +97,7 @@ def help():
   {}Exemplo{}
   
     {}python3 Organi_App.py --update{}
-    {}python Organi_App.py /home/carlinhos /home/arquivos_organizados_carlinhos --ext{}
+    {}python3 Organi_App.py /home/carlinhos /home/arquivos_organizados_carlinhos --ext{}
   """.format(*format_help)
 	print(_help)
 	return True
@@ -122,7 +128,7 @@ def progress():
 
 	while oc._progress <= 100 and progress_var == True:
 		n = int(oc._progress) if int(oc._progress + 0.5) >= oc._progress else int(oc._progress) + 1
-		print("{}{}{}{}% dos arquivos baixados{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_PURPLE, n, code_END), end="", flush=True)
+		print("{}{}{}{}% dos arquivos baixados{}".format(code_CLEAR_LINE, code_MOVE_INIT, code_PURPLE, n, code_END), flush=True, end="")
 		time.sleep(1)
 	oc._progress = 0
 
@@ -166,7 +172,6 @@ def args_check(arg):
 	"""
 
 	dict_of_args = {("--help", "-h"):"help", ("--update", "-p"):"update", ("--ext", "-e"):0, ("--common", "-c"):1}
-
 	for key, value in dict_of_args.items():
 		if arg in key:
 			try:
@@ -197,7 +202,7 @@ def start_app(*argv):
 
 	mode_function = args_check(argv[3])
 	db = shelve.open(abs_dir_db, "c")
-	if mode_function == False:
+	if mode_function == False and mode_function != 0:
 		print("{}Você não digitou nenhum comando! Por favor, consulte o --help{}")
 	else:
 		init_app(argv[1], argv[2], db, mode_function)
@@ -208,6 +213,7 @@ def init_app(path_from, path_to, db_object, mode):
 	"""
 	O Cerebro do App
 	"""
+	global md5_list_file
 	n_files = 1
 
 	for path, list_path, files in os.walk(path_from):
@@ -231,11 +237,18 @@ def init_app(path_from, path_to, db_object, mode):
 				os.chdir(list_mode[mode])
 			finally:
 				try:
-					os.replace(os.path.join(path, aqv), os.path.join(os.getcwd(), aqv))
-				except Exception as e:
-					print("Error")
-				os.chdir("..")
+					files_local = os.path.join(path, aqv)
+					md5_file = subprocess.run(["md5sum", "{}".format(files_local)], stdout=subprocess.PIPE)
+					md5_file = md5_file.stdout.decode().split()[0]
 
+					if md5_file in md5_list_file:
+						pass
+					else:
+						os.replace(os.path.join(path, aqv), os.path.join(os.getcwd(), aqv))
+						md5_list_file += (md5_file,)
+				except Exception as e:
+					print("{}Error: {}{}".format(code_RED, e, code_END))
+				os.chdir("..")
 	print("")
 if __name__ == "__main__":
 	print("{}Bem Vindo! {} {}".format(code_BLACK, os.uname()[1].capitalize(), code_END))
