@@ -224,6 +224,8 @@ def init_app(path_from, path_to, db_object, mode):
 			ext = ext.replace(".", "")
 			ext = ext if ext != "" else "others"
 			list_mode = [ext.capitalize()]
+			file_info = subprocess.getoutput("ls -l \"{}/{}\"".format(path, aqv)).split(" ")
+			file_date = file_info[5].capitalize()
 			try:
 				list_mode.append(db_object[ext][1]) 
 			except:
@@ -232,23 +234,28 @@ def init_app(path_from, path_to, db_object, mode):
 				list_mode.append(ext.capitalize())
 			try:
 				os.mkdir(list_mode[mode])
-				os.chdir(list_mode[mode])
+				os.chdir((list_mode[mode]))
 			except:
 				os.chdir(list_mode[mode])
-			finally:
 				try:
-					files_local = os.path.join(path, aqv)
-					md5_file = subprocess.run(["md5sum", "{}".format(files_local)], stdout=subprocess.PIPE)
-					md5_file = md5_file.stdout.decode().split()[0]
+					os.mkdir(file_date)
+					os.chdir(file_date)
+				except:
+					os.chdir(file_date)
+			try:
+				files_local = os.path.join(path, aqv)
+				md5_file = subprocess.run(["md5sum", "{}".format(files_local)], stdout=subprocess.PIPE)
+				md5_file = md5_file.stdout.decode().split()[0]
 
-					if md5_file in md5_list_file:
-						pass
-					else:
-						os.replace(os.path.join(path, aqv), os.path.join(os.getcwd(), aqv))
-						md5_list_file += (md5_file,)
-				except Exception as e:
-					print("{}Error: {}{}".format(code_RED, e, code_END))
-				os.chdir("..")
+				if md5_file in md5_list_file:
+					pass
+				else:
+					os.replace(os.path.join(path, aqv), os.path.join(os.getcwd(), aqv))
+					md5_list_file += (md5_file,)
+			except Exception as e:
+				print("{}Error: {}{}".format(code_RED, e, code_END))
+			os.chdir("..")
+			os.chdir("..")
 	print("")
 if __name__ == "__main__":
 	print("{}Bem Vindo! {} {}".format(code_BLACK, os.uname()[1].capitalize(), code_END))
