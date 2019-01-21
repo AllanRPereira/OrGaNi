@@ -237,11 +237,11 @@ def init_app(path_from, path_to, db_object, mode):
 				os.chdir((list_mode[mode]))
 			except:
 				os.chdir(list_mode[mode])
-				try:
-					os.mkdir(file_date)
-					os.chdir(file_date)
-				except:
-					os.chdir(file_date)
+			try:
+				os.mkdir(file_date)
+				os.chdir(file_date)
+			except:
+				os.chdir(file_date)
 			try:
 				files_local = os.path.join(path, aqv)
 				md5_file = subprocess.run(["md5sum", "{}".format(files_local)], stdout=subprocess.PIPE)
