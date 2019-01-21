@@ -1,6 +1,6 @@
 # OrGaNi
 
-Software voltado para organização de arquivos com base nas preferências do usuário. Esse software funciona apenas em sistemas Linux
+Software voltado para organização de arquivos com base nas preferências do usuário. Esse software funciona apenas em sistemas Linux.
    
 
 ## Funcionamento
@@ -17,14 +17,18 @@ não recomenda-se que haja arquivos nele
 
 `mode` : Modos para organização, podem ser `ext` ou `common`.
 
+Com o propósito de transformar a organização e deixá-la mais simplificada, os arquivos são agrupados com base no mês da modificação mais recente.
+
 #### Ext
 
 ```
 path_to/
 |--- Png/
-|------ *.png
+|------Jan/
+|--------- *.png
 |--- Mp3/
-|------ *.mp3
+|------Jan/
+|--------- *.mp3
 |--- .../
 ```
 
@@ -33,9 +37,11 @@ path_to/
 ```
 path_to/
 |--- Images/
-|------ *.png, *jpg
+|------Jan/
+|--------- *.png, *jpg
 |--- Sounds/
-|------ *.mp3, *.wav
+|------Jan/
+|--------- *.mp3, *.wav
 |--- .../
 ```
 
@@ -59,8 +65,9 @@ Os requerimentos para executar esse software são:
 
 * python3
 * conexão internet
+* sistema Linux
 
 Nada mais é necessário para executá-lo
 
-![Release](https://img.shields.io/badge/Relase-0.5-lightgrey.svg)
+![Release](https://img.shields.io/badge/Relase-0.7-lightgrey.svg)
 ![Build](https://img.shields.io/badge/Build-Passive-brightgreen.svg)
