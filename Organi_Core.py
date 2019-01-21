@@ -3,6 +3,7 @@
 import urllib.request
 import shelve
 import os
+import subprocess
 
 """
 OrGaNi_Core, parte responsável pelo update do banco de dados!
@@ -156,6 +157,8 @@ def gen_db_ext():
 		db[list_of_extensions[index]] = list_of_description_wfather[index]
 
 	db.close()
-
+	
+	subprocess.run("rm -r Files")
+	
 	return True
 
