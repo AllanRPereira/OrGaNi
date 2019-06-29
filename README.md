@@ -5,7 +5,9 @@ Software voltado para organização de arquivos com base nas preferências do us
 
 ## Funcionamento
 	
-O software funciona da seguinte forma:
+O software funciona de duas formas 
+
+### Pelo Terminal
 
 `python3 Organi_App.py [path_from] [path_to] [--mode]`
 
@@ -18,6 +20,12 @@ não recomenda-se que haja arquivos nele
 `mode` : Modos para organização, podem ser `ext` ou `common`.
 
 Com o propósito de transformar a organização e deixá-la mais simplificada, os arquivos são agrupados com base no mês da modificação mais recente.
+
+### Pela Interfáce Gráfica 
+
+`python3 Organi_Interface.py`: Com esse código toda interfáce gŕáfica do software irá iniciar e eles funcionará adequadamente
+
+### Formas de Organização
 
 #### Ext
 
@@ -66,8 +74,9 @@ Os requerimentos para executar esse software são:
 * python3
 * conexão internet
 * sistema Linux
+* software md5sum
 
 Nada mais é necessário para executá-lo
 
-![Release](https://img.shields.io/badge/Relase-0.7-lightgrey.svg)
+![Release](https://img.shields.io/badge/Relase-2.0-lightgrey.svg)
 ![Build](https://img.shields.io/badge/Build-Passive-brightgreen.svg)
