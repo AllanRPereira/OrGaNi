@@ -158,7 +158,7 @@ def gen_db_ext():
 
 	db.close()
 	
-	subprocess.run("rm -r Files")
+	subprocess.run(("rm", "-r", "Files"))
 	
 	return True
 
