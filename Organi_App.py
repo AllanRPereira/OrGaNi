@@ -57,7 +57,7 @@ def print_instance(text, files_to_format="" , exception="", cycle=False, **argvs
 			string_index_end = "{}.{}".format(last_column+1, 0)
 			tk_instance_string.delete(string_index_init, string_index_end)
 	else:
-		print(text.format(*files_to_format), *argvs)
+		print(text.format(*files_to_format), **argvs)
 
 
 def log(error):
@@ -147,10 +147,11 @@ def condition(*argv):
 		print_instance("{}path_to{}{} não pode estar dentro de {}{}path_from{}", (code_BLACK,code_END, code_RED, code_END, code_BLACK, code_END))
 	elif not cond_four:
 		print_instance("{}Banco de Dados não existe! Dê uma olhada no --help ou use --update{}", (code_RED, code_END))
+		return "BD"
 	else:
-		pass
+		return True
 	
-	return True
+	return False
 
 def progress():
 	"""
@@ -223,34 +224,56 @@ def start_app(*argv):
 	"""
 	global set_print_instance
 	global tk_instance_string
-	
+	response_check = False
+
 	if argv[0] == "Graphics":
 		set_print_instance = 1
 		tk_instance_string = argv[len(argv) - 2]
 
-	if len(argv) <= 2 or argv[0] == "Graphics":
-		response = args_check(argv[::-1][2])
-		if response == False and response not in (0,1):
+	if len(argv) == 1:
 			print_instance("{}Argumentos inválidos! Olhe o --help{}", (code_RED, code_END))
 			return False
+
+	if argv[0] == "Graphics":
+		response_check = args_check(argv[::-1][2])
+		if response_check== False and response_check not in (0,1):
+			print_instance("{}Argumentos inválidos! Olhe o --help{}", (code_RED, code_END))
+			return False
+	elif len(argv) <= 2:
+		response_check = args_check(argv[::-1][0])
+		if response_check == False:
+			print_instance("{}Argumentos inválidos! Olhe o --help{}", (code_RED, code_END))
+			return False
+	else:
+		pass 
 
 	try:
 		os.mkdir(argv[2])
 	except Exception as e:
 		pass
 
-	condition(*argv)
+	condition_return = condition(*argv)
+	if condition_return == False:
+		return False
+	elif condition_return == "BD":
+		if response_check == 0:
+			pass
+		else:
+			return False
+
 	os.chdir(argv[2])	
 
-	mode_function = args_check(argv[3])
-	db = shelve.open(abs_dir_db, "c")
-	if mode_function == False and mode_function != 0:
-		print_instance("{}Você não digitou nenhum comando! Por favor, consulte o --help{}")
+	mode_function = response_check
+	
+	if mode_function != 0:
+		db = shelve.open(abs_dir_db, "c")
 	else:
-		if argv[0] == "Graphics":
-			init_app(argv[1], argv[2], db, mode_function, argv[::-1][0])
-		else:
-			init_app(argv[1], argv[2], db, mode_function)
+		db = None
+
+	if argv[0] == "Graphics":
+		init_app(argv[1], argv[2], db, mode_function, argv[::-1][0])
+	else:
+		init_app(argv[1], argv[2], db, mode_function)
 
 	return True
 
@@ -272,17 +295,19 @@ def init_app(path_from, path_to, db_object, mode, month_replace=(1,1)):
 			list_mode = [ext.capitalize()]
 			file_info = subprocess.getoutput("ls -l \"{}/{}\"".format(path, aqv)).split(" ")
 			file_date_month = file_info[5].capitalize()
-			try:
-				list_mode.append(db_object[ext][1]) 
-			except:
-				msg = "File {}: não foi encontrado no Db, será adicionado em uma pasta com sua extensão!\n".format(name)
-				log(msg)
-				list_mode.append(ext.capitalize())
-			try:
-				os.mkdir(list_mode[mode])
-				os.chdir((list_mode[mode]))
-			except:
-				os.chdir(list_mode[mode])
+			if db_object != None:
+				try:
+					list_mode.append(db_object[ext][1]) 
+				except:
+					msg = "File {}: não foi encontrado no Db, será adicionado em uma pasta com sua extensão!\n".format(name)
+					log(msg)
+					list_mode.append(ext.capitalize())
+			else:
+				try:
+					os.mkdir(list_mode[mode])
+					os.chdir((list_mode[mode]))
+				except:
+					os.chdir(list_mode[mode])
 
 			if month_replace != "" and month_replace[0] == 1:
 				try:
@@ -305,7 +330,7 @@ def init_app(path_from, path_to, db_object, mode, month_replace=(1,1)):
 			os.chdir("..")
 			if month_replace[0] == 1:
 				os.chdir("..")
-
+	print("")
 	if set_print_instance == 1:
 		print_instance("Arquivos Organizados!!")
 if __name__ == "__main__":
