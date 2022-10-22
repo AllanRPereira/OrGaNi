@@ -19,8 +19,6 @@ não recomenda-se que haja arquivos nele
 
 `mode` : Modos para organização, podem ser `ext` ou `common`.
 
-Com o propósito de transformar a organização e deixá-la mais simplificada, os arquivos são agrupados com base no mês da modificação mais recente.
-
 ### Pela Interfáce Gráfica 
 
 `python3 -m organi --gui`: Com esse código toda interfáce gŕáfica do software irá iniciar e eles funcionará adequadamente
@@ -55,7 +53,7 @@ path_to/
 
 ## Testes
 
-`python3 -m unittest -v`: Executar as unidades de teste para verificar a integridade do software.
+`python3 -m unittest -v`: Executa as unidades de teste para verificar a integridade do software.
 
 ## Exemplo
 
@@ -70,7 +68,7 @@ python3 -m organi /home/carlinhos /home/arquivos_organizados_carlinhos --ext
 Os requerimentos para executar esse software são:
 
 * python3
-* conexão com ainternet
+* conexão com a internet
 
 Nada mais é necessário para executá-lo
 
