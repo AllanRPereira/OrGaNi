@@ -1,4 +1,4 @@
-# OrGaNi
+# Organi
 
 Software voltado para organização de arquivos com base nas preferências do usuário. Esse software funciona apenas em sistemas Linux.
    
@@ -9,7 +9,7 @@ O software funciona de duas formas
 
 ### Pelo Terminal
 
-`python3 Organi_App.py [path_from] [path_to] [--mode]`
+`python3 -m organi [path_from] [path_to] [--mode]`
 
 `path_from` : Diretório que será organizado, caso haja alguma pasta que possua permissão de root, use `sudo` antes do 
 python3. Obs.: Os arquivos nessa pasta serão movidos!
@@ -23,7 +23,7 @@ Com o propósito de transformar a organização e deixá-la mais simplificada, o
 
 ### Pela Interfáce Gráfica 
 
-`python3 Organi_Interface.py`: Com esse código toda interfáce gŕáfica do software irá iniciar e eles funcionará adequadamente
+`python3 -m organi --gui`: Com esse código toda interfáce gŕáfica do software irá iniciar e eles funcionará adequadamente
 
 ### Formas de Organização
 
@@ -36,15 +36,7 @@ path_to/
 |--------- *.png
 |--- Mp3/
 |------Jan/
-|--------- *.mp3
-|--- .../
-```
-
-#### Common
-
-```
-path_to/
-|--- Images/
+|--------- *.mp3organi
 |------Jan/
 |--------- *.png, *jpg
 |--- Sounds/
@@ -55,15 +47,21 @@ path_to/
 
 ## Algumas outras funções!
 
-`--update (-p)`: Atualiza o banco de dados da aplicação, é necessário para executa-lá
+`--update (-p)`: Atualiza o banco de dados da aplicação, é necessário para executa-lá.
 
-`--help (-h)`: Mostra o menu, com todas as informações da aplicação
+`--help (-h)`: Mostra o menu, com todas as informações da aplicação.
+
+`--month (-m)`: Além da organização definida, organiza também pelo mês de modificação de cada arquivo.
+
+## Testes
+
+`python3 -m unittest -v`: Executar as unidades de teste para verificar a integridade do software.
 
 ## Exemplo
 
 ```
-python3 Organi_App.py --update
-python3 Organi_App.py /home/carlinhos /home/arquivos_organizados_carlinhos --ext
+python3 -m organi --update
+python3 -m organi /home/carlinhos /home/arquivos_organizados_carlinhos --ext
 ```
 
 
@@ -72,11 +70,9 @@ python3 Organi_App.py /home/carlinhos /home/arquivos_organizados_carlinhos --ext
 Os requerimentos para executar esse software são:
 
 * python3
-* conexão internet
-* sistema Linux
-* software md5sum
+* conexão com ainternet
 
 Nada mais é necessário para executá-lo
 
-![Release](https://img.shields.io/badge/Relase-2.0-lightgrey.svg)
+![Release](https://img.shields.io/badge/Release-2.0-lightgrey.svg)
 ![Build](https://img.shields.io/badge/Build-Passive-brightgreen.svg)
